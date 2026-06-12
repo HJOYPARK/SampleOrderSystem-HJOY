@@ -43,22 +43,28 @@ private:
     }
 
     void showStockStatuses() {
-        auto statuses = ctrl_.getStockStatuses();
+        auto infos = ctrl_.getStockInfos();
         std::cout << "\n재고 현황\n\n";
         std::cout << padRight("시료명", 24)
-                  << padRight("재고", 12)
+                  << padRight("재고", 10)
                   << padRight("상태", 8)
-                  << "잔여율\n";
+                  << "잔여율\n"
+                  << std::string(70, '-') << "\n";
 
-        for (auto& [id, status] : statuses) {
+        for (auto& info : infos) {
             std::string label;
-            if (status == StockStatus::SUFFICIENT) label = "여유";
-            else if (status == StockStatus::SHORTAGE) label = "부족";
+            if (info.status == StockStatus::SUFFICIENT) label = "여유";
+            else if (info.status == StockStatus::SHORTAGE) label = "부족";
             else label = "고갈";
-            std::cout << padRight(id, 24)
-                      << padRight("-", 12)
+
+            double ratio = info.coverageRatio();
+            int pct      = static_cast<int>(ratio * 100);
+            std::string stockStr = std::to_string(info.stock) + " ea";
+
+            std::cout << padRight(info.name, 24)
+                      << padRight(stockStr, 10)
                       << padRight(label, 8)
-                      << "\n";
+                      << makeBar(ratio) << "  " << pct << "%\n";
         }
         getString("\nEnter를 누르면 위로...");
     }
