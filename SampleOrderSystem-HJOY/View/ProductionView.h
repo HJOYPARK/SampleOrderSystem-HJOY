@@ -20,8 +20,10 @@ public:
             ctrl_.syncProduction();
 
             printSeparator();
+            // 전체 PRODUCING 건수 = 큐 전체 크기 (모니터링 PRODUCING 건수와 일치)
+            int totalProducing = static_cast<int>(ctrl_.getAllJobs().size());
             std::cout << "[5] 생산라인 조회   FIFO 방식\n\n";
-            std::cout << "생산라인 1개 (단일 라인)\n\n";
+            std::cout << "생산라인 1개 (단일 라인)   PRODUCING 총 " << totalProducing << "건\n\n";
 
             auto current = ctrl_.getCurrentJob();
             if (current.has_value()) {
@@ -59,7 +61,10 @@ public:
             }
 
             auto waiting = ctrl_.getWaitingJobs();
-            std::cout << "대기 중인 주문  (FIFO 순)  " << waiting.size() << "건\n\n";
+            std::cout << "대기 중인 주문  (FIFO 순)  " << waiting.size() << "건";
+            if (current.has_value())
+                std::cout << "  (생산 중 1건 포함 총 PRODUCING " << totalProducing << "건)";
+            std::cout << "\n\n";
             if (!waiting.empty()) {
                 std::cout << padRight("순서", 6)
                           << padRight("주문번호", 20)
