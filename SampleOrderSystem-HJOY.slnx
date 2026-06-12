@@ -3,6 +3,6 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="SampleOrderSystem-HJOY/SampleOrderSystem-HJOY.vcxproj" />
-  <Project Path="SampleOrderSystemTest/SampleOrderSystemTest.vcxproj" />
+  <Project Path="SampleOrderSystem-HJOY/SampleOrderSystem-HJOY.vcxproj" Id="c42b9f7f-7b34-4589-a88f-55f6ffd2274a" />
+  <Project Path="SampleOrderSystemTest/SampleOrderSystemTest.vcxproj" Id="a1b2c3d4-e5f6-7890-abcd-ef1234567890" />
 </Solution>
