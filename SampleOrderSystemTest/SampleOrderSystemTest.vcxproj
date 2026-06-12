@@ -105,10 +105,14 @@
 
   <!-- 테스트 소스 파일 -->
   <ItemGroup>
+    <ClCompile Include="$(MSBuildProjectDirectory)\..\SampleOrderSystem-HJOY\Repository\JsonSerializer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="main_test.cpp" />
     <ClCompile Include="SampleTest.cpp" />
     <ClCompile Include="OrderTest.cpp" />
     <ClCompile Include="ProductionJobTest.cpp" />
+    <ClCompile Include="RepositoryTest.cpp" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
