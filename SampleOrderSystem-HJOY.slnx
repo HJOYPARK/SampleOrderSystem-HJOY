@@ -4,4 +4,5 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="SampleOrderSystem-HJOY/SampleOrderSystem-HJOY.vcxproj" />
+  <Project Path="SampleOrderSystemTest/SampleOrderSystemTest.vcxproj" />
 </Solution>
