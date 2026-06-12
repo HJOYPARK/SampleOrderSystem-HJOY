@@ -117,6 +117,7 @@
     <ClCompile Include="OrderControllerTest.cpp" />
     <ClCompile Include="ProductionControllerTest.cpp" />
     <ClCompile Include="MonitoringReleaseControllerTest.cpp" />
+    <ClCompile Include="IntegrationTest.cpp" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
