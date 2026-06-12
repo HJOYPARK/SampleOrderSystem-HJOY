@@ -49,8 +49,12 @@ struct Order {
                      newStatus == OrderStatus::REJECTED);
             break;
         case OrderStatus::CONFIRMED:
-        case OrderStatus::PRODUCING:
             valid = (newStatus == OrderStatus::RELEASE);
+            break;
+        case OrderStatus::PRODUCING:
+            // After production completes: CONFIRMED (stock now sufficient) or RELEASE
+            valid = (newStatus == OrderStatus::CONFIRMED ||
+                     newStatus == OrderStatus::RELEASE);
             break;
         default:
             break;
