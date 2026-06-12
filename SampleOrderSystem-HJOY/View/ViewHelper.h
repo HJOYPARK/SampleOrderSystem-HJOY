@@ -53,10 +53,13 @@ inline std::string currentDateTimeString() {
     return oss.str();
 }
 
-inline std::string makeBar(int filled, int total = 10, char on = L'\xDB', char off = L'\xB0') {
+// progress: 0.0 ~ 1.0
+inline std::string makeBar(double progress, int total = 10) {
+    int filled = static_cast<int>(progress * total);
+    if (filled > total) filled = total;
     std::string bar;
     for (int i = 0; i < total; ++i)
-        bar += (i < filled) ? on : off;
+        bar += (i < filled) ? "█" : "░";
     return bar;
 }
 

@@ -6,6 +6,7 @@
 #include "Model/Order.h"
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 
 class ProductionView {
 public:
@@ -16,6 +17,8 @@ public:
 
     void run() {
         while (true) {
+            ctrl_.syncProduction();
+
             printSeparator();
             std::cout << "[5] 생산라인 조회   FIFO 방식\n\n";
             std::cout << "생산라인 1개 (단일 라인)\n\n";
@@ -26,14 +29,27 @@ public:
                 auto sOpt = sampleRepo_.findById(job.sampleId);
                 std::string sname = sOpt.has_value() ? sOpt->name : job.sampleId;
 
-                std::cout << "현재 처리 중\n\n";
+                // 진행률 계산
+                double progress = ctrl_.getCurrentJobProgress();
+                int pct         = static_cast<int>(progress * 100);
+                double remainMin = job.totalProductionTime * (1.0 - progress);
+
+                std::cout << "현재 처리 중  [RUNNING]\n\n";
                 std::cout << "  주문번호  " << job.orderId << "   시료  " << sname << "\n";
+
                 double yr = sOpt.has_value() ? sOpt->yieldRate : 0.0;
                 std::cout << "  부족분    " << job.shortage << " ea"
                           << "   실생산량  " << job.actualProduction << " ea"
-                          << "   (수율 " << yr
-                          << " / " << static_cast<int>(job.totalProductionTime) << " min)\n";
-                std::cout << "  진행      [생산 중...]\n\n";
+                          << "   (수율 " << std::fixed << std::setprecision(2) << yr
+                          << " / " << std::fixed << std::setprecision(1)
+                          << job.totalProductionTime << " min)\n";
+
+                std::cout << "  진행      " << makeBar(progress) << "  " << pct << "%";
+                if (progress < 1.0)
+                    std::cout << "   잔여 " << std::fixed << std::setprecision(1) << remainMin << " min";
+                else
+                    std::cout << "   완료 대기 중...";
+                std::cout << "\n\n";
             } else {
                 std::cout << "현재 처리 중인 생산 작업 없음\n\n";
             }
@@ -57,24 +73,12 @@ public:
                               << job.actualProduction << " ea\n";
                 }
             }
-            std::cout << "\n* 실생산량 = ceil(부족분 / (수율 * 0.9))\n";
-            std::cout << "* 선입선출(FIFO) 방식으로 처리됩니다.\n\n";
 
-            if (current.has_value()) {
-                std::cout << "[C] 생산 완료 처리   [0] 위로\n";
-                char c = getChar("선택 > ");
-                if (c == '0') break;
-                if (c == 'C') {
-                    if (ctrl_.completeCurrentProduction())
-                        std::cout << "\n생산 완료 처리됨.  주문 상태 PRODUCING -> CONFIRMED\n";
-                    else
-                        std::cout << "\n처리 오류.\n";
-                    getString("Enter를 누르면 계속...");
-                }
-            } else {
-                getString("[0] 위로 (Enter) > ");
-                break;
-            }
+            std::cout << "\n* 실생산량 = ceil(부족분 / (수율 * 0.9))\n";
+            std::cout << "* 선입선출(FIFO) 방식 / 실제 시간 기반 자동 완료\n\n";
+
+            getString("[0] 위로 (Enter) > ");
+            break;
         }
     }
 

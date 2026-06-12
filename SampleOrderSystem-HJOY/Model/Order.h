@@ -13,17 +13,21 @@ enum class OrderStatus {
 };
 
 struct Order {
-    std::string orderId;
-    std::string sampleId;
-    std::string customerName;
-    int         quantity;
-    OrderStatus status;
+    std::string  orderId;
+    std::string  sampleId;
+    std::string  customerName;
+    int          quantity;
+    OrderStatus  status;
+    std::time_t  productionStartTime = 0; // 생산 시작 시각 (0 = 생산 중 아님)
+    int          shortage            = 0; // 승인 시점의 부족분
+    int          actualProduction    = 0; // 실 생산량
 
     Order(const std::string& orderId, const std::string& sampleId,
           const std::string& customerName, int quantity)
         : orderId(orderId), sampleId(sampleId),
           customerName(customerName), quantity(quantity),
-          status(OrderStatus::RESERVED)
+          status(OrderStatus::RESERVED),
+          productionStartTime(0), shortage(0), actualProduction(0)
     {
         if (quantity <= 0)
             throw std::invalid_argument("quantity must be positive");

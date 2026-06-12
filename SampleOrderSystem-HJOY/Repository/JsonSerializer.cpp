@@ -46,7 +46,20 @@ int JsonSerializer::extractIntValue(const std::string& json, const std::string& 
     std::string num;
     while (pos < json.size() && (std::isdigit(json[pos]) || json[pos] == '-'))
         num += json[pos++];
+    if (num.empty()) return 0;
     return std::stoi(num);
+}
+
+long long JsonSerializer::extractLongLongValue(const std::string& json, const std::string& key) {
+    std::string needle = "\"" + key + "\":";
+    auto pos = json.find(needle);
+    if (pos == std::string::npos) return 0LL;
+    pos += needle.size();
+    std::string num;
+    while (pos < json.size() && (std::isdigit(json[pos]) || json[pos] == '-'))
+        num += json[pos++];
+    if (num.empty()) return 0LL;
+    return std::stoll(num);
 }
 
 std::string JsonSerializer::statusToString(OrderStatus s) {
@@ -99,6 +112,9 @@ std::string JsonSerializer::toJson(const Order& o) {
         << ",\"customerName\":\"" << escapeString(o.customerName) << "\""
         << ",\"quantity\":" << o.quantity
         << ",\"status\":\"" << statusToString(o.status) << "\""
+        << ",\"productionStartTime\":" << static_cast<long long>(o.productionStartTime)
+        << ",\"shortage\":" << o.shortage
+        << ",\"actualProduction\":" << o.actualProduction
         << "}";
     return oss.str();
 }
@@ -120,5 +136,8 @@ Order JsonSerializer::orderFromJson(const std::string& json) {
             o.changeStatus(OrderStatus::RELEASE);
         }
     }
+    o.productionStartTime = static_cast<std::time_t>(extractLongLongValue(json, "productionStartTime"));
+    o.shortage            = extractIntValue(json, "shortage");
+    o.actualProduction    = extractIntValue(json, "actualProduction");
     return o;
 }

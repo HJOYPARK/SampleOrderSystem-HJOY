@@ -13,9 +13,10 @@ public:
 
 private:
     static std::string escapeString(const std::string& s);
-    static std::string extractStringValue(const std::string& json, const std::string& key);
-    static double extractDoubleValue(const std::string& json, const std::string& key);
-    static int extractIntValue(const std::string& json, const std::string& key);
+    static std::string   extractStringValue  (const std::string& json, const std::string& key);
+    static double        extractDoubleValue  (const std::string& json, const std::string& key);
+    static int           extractIntValue     (const std::string& json, const std::string& key);
+    static long long     extractLongLongValue(const std::string& json, const std::string& key);
     static std::string statusToString(OrderStatus s);
     static OrderStatus stringToStatus(const std::string& s);
 };

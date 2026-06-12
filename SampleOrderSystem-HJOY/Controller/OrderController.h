@@ -48,14 +48,15 @@ public:
             orderRepo_->update(order);
             return OrderStatus::CONFIRMED;
         } else {
-            // Stock insufficient -> PRODUCING, enqueue production job
+            // Stock insufficient -> PRODUCING, record production start + enqueue
+            ProductionJob job(orderId, order.sampleId, shortage,
+                              sample.yieldRate, sample.avgProductionTime);
             order.changeStatus(OrderStatus::PRODUCING);
+            order.productionStartTime = std::time(nullptr);
+            order.shortage            = shortage;
+            order.actualProduction    = job.actualProduction;
             orderRepo_->update(order);
-            if (queue_) {
-                ProductionJob job(orderId, order.sampleId, shortage,
-                                  sample.yieldRate, sample.avgProductionTime);
-                queue_->enqueue(job);
-            }
+            if (queue_) queue_->enqueue(job);
             return OrderStatus::PRODUCING;
         }
     }

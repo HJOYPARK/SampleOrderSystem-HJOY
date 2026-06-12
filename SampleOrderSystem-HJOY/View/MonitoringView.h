@@ -1,16 +1,19 @@
 #pragma once
 #include "ViewHelper.h"
 #include "Controller/MonitoringController.h"
+#include "Controller/ProductionController.h"
 #include <iostream>
 #include <iomanip>
 #include <map>
 
 class MonitoringView {
 public:
-    explicit MonitoringView(MonitoringController& ctrl) : ctrl_(ctrl) {}
+    MonitoringView(MonitoringController& ctrl, ProductionController& prodCtrl)
+        : ctrl_(ctrl), prodCtrl_(prodCtrl) {}
 
     void run() {
         while (true) {
+            prodCtrl_.syncProduction();
             printSeparator();
             std::cout << "[4] 모니터링   " << currentDateTimeString() << "\n\n";
             std::cout << "[1] 주문량 확인   [2] 재고량 확인   [0] 위로\n";
@@ -23,6 +26,7 @@ public:
 
 private:
     MonitoringController& ctrl_;
+    ProductionController& prodCtrl_;
 
     void showOrderCounts() {
         auto counts = ctrl_.getOrderCounts();

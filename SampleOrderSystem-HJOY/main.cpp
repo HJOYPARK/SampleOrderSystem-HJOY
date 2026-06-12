@@ -3,6 +3,7 @@
 #include "Repository/SampleRepository.h"
 #include "Repository/OrderRepository.h"
 #include "Model/ProductionQueue.h"
+#include "Model/ProductionJob.h"
 #include "Controller/SampleController.h"
 #include "Controller/OrderController.h"
 #include "Controller/ProductionController.h"
@@ -18,47 +19,62 @@
 #include "Tools/DummyDataGenerator.h"
 #include <iostream>
 #include <filesystem>
+#include <algorithm>
+#include <vector>
 
 int main() {
-    // Set console output to UTF-8 so Korean strings display correctly
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
-    // Disable sync for faster I/O
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
 
-    // Ensure data directory exists
     std::filesystem::create_directories("data");
 
-    // Repository initialization
     SampleRepository sampleRepo("data/samples.json");
     OrderRepository  orderRepo("data/orders.json");
     ProductionQueue  productionQueue;
 
-    // Generate sample data if empty
     if (sampleRepo.findAll().empty()) {
         DummyDataGenerator gen("data/");
         gen.generateSamples(5);
     }
 
-    // Controller initialization (dependency injection)
+    // PRODUCING 상태 주문으로 생산 큐 재구성 (앱 재시작 시 이어서 진행)
+    {
+        auto allOrders = orderRepo.findAll();
+        std::vector<Order> producing;
+        for (auto& o : allOrders)
+            if (o.status == OrderStatus::PRODUCING && o.shortage > 0)
+                producing.push_back(o);
+        std::sort(producing.begin(), producing.end(),
+                  [](const Order& a, const Order& b) {
+                      return a.productionStartTime < b.productionStartTime;
+                  });
+        for (auto& o : producing) {
+            auto sOpt = sampleRepo.findById(o.sampleId);
+            if (!sOpt.has_value()) continue;
+            productionQueue.enqueue(
+                ProductionJob(o.orderId, o.sampleId, o.shortage,
+                              sOpt->yieldRate, sOpt->avgProductionTime));
+        }
+    }
+
     SampleController     sampleCtrl(&sampleRepo);
     OrderController      orderCtrl(&sampleRepo, &orderRepo, &productionQueue);
     ProductionController prodCtrl(&productionQueue, &sampleRepo, &orderRepo);
     MonitoringController monCtrl(&orderRepo, &sampleRepo);
     ReleaseController    releaseCtrl(&orderRepo, &sampleRepo);
 
-    // View initialization
     MainView       mainView;
-    SampleView     sampleView(sampleCtrl);
+    SampleView     sampleView(sampleCtrl, prodCtrl);
     OrderView      orderView(orderCtrl, sampleRepo);
     ApprovalView   approvalView(orderCtrl, sampleRepo);
-    MonitoringView monitoringView(monCtrl);
+    MonitoringView monitoringView(monCtrl, prodCtrl);
     ProductionView productionView(prodCtrl, sampleRepo, orderRepo);
     ReleaseView    releaseView(releaseCtrl, sampleRepo);
 
-    // Main loop
     while (true) {
+        prodCtrl.syncProduction();
         mainView.display(sampleRepo, orderRepo, productionQueue);
         int choice = mainView.getMenuChoice();
 

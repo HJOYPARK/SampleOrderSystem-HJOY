@@ -7,6 +7,7 @@
 #include <optional>
 #include <vector>
 #include <stdexcept>
+#include <ctime>
 
 class ProductionController {
 public:
@@ -28,6 +29,40 @@ public:
 
     std::vector<ProductionJob> getAllJobs() {
         return queue_->getAllJobs();
+    }
+
+    // 경과 시간 확인 후 완료된 작업을 자동으로 처리한다
+    void syncProduction() {
+        while (!queue_->empty()) {
+            auto jobOpt = queue_->front();
+            if (!jobOpt.has_value()) break;
+
+            auto orderOpt = orderRepo_->findById(jobOpt->orderId);
+            if (!orderOpt.has_value()) { queue_->dequeue(); continue; }
+
+            if (orderOpt->productionStartTime == 0) break;
+
+            std::time_t now = std::time(nullptr);
+            double elapsedMin = std::difftime(now, orderOpt->productionStartTime) / 60.0;
+            if (elapsedMin >= jobOpt->totalProductionTime)
+                completeCurrentProduction();
+            else
+                break;
+        }
+    }
+
+    // 현재 작업의 진행률 (0.0 ~ 1.0) 반환
+    double getCurrentJobProgress() const {
+        auto jobOpt = queue_->front();
+        if (!jobOpt.has_value()) return 0.0;
+
+        auto orderOpt = orderRepo_->findById(jobOpt->orderId);
+        if (!orderOpt.has_value() || orderOpt->productionStartTime == 0) return 0.0;
+
+        std::time_t now = std::time(nullptr);
+        double elapsedMin = std::difftime(now, orderOpt->productionStartTime) / 60.0;
+        double progress = elapsedMin / jobOpt->totalProductionTime;
+        return progress < 1.0 ? progress : 1.0;
     }
 
     bool completeCurrentProduction() {

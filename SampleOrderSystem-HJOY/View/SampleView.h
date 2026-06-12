@@ -1,13 +1,15 @@
 #pragma once
 #include "ViewHelper.h"
 #include "Controller/SampleController.h"
+#include "Controller/ProductionController.h"
 #include <vector>
 #include <iostream>
 #include <iomanip>
 
 class SampleView {
 public:
-    explicit SampleView(SampleController& ctrl) : ctrl_(ctrl) {}
+    SampleView(SampleController& ctrl, ProductionController& prodCtrl)
+        : ctrl_(ctrl), prodCtrl_(prodCtrl) {}
 
     void run() {
         while (true) {
@@ -23,7 +25,8 @@ public:
     }
 
 private:
-    SampleController& ctrl_;
+    SampleController&    ctrl_;
+    ProductionController& prodCtrl_;
 
     void listSamples(const std::vector<Sample>& samples, int page) {
         const int PAGE_SIZE = 5;
@@ -55,6 +58,7 @@ private:
     }
 
     void listSamples() {
+        prodCtrl_.syncProduction();
         auto all = ctrl_.listSamples();
         int page = 0;
         while (true) {
