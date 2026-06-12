@@ -41,10 +41,9 @@ private:
     void showStockStatuses() {
         auto statuses = ctrl_.getStockStatuses();
         std::cout << "\n재고 현황\n\n";
-        std::cout << std::left
-                  << std::setw(24) << "시료명"
-                  << std::setw(12) << "재고"
-                  << std::setw(8)  << "상태"
+        std::cout << padRight("시료명", 24)
+                  << padRight("재고", 12)
+                  << padRight("상태", 8)
                   << "잔여율\n";
 
         for (auto& [id, status] : statuses) {
@@ -52,9 +51,9 @@ private:
             if (status == StockStatus::SUFFICIENT) label = "여유";
             else if (status == StockStatus::SHORTAGE) label = "부족";
             else label = "고갈";
-            std::cout << std::setw(24) << id
-                      << std::setw(12) << "-"
-                      << std::setw(8)  << label
+            std::cout << padRight(id, 24)
+                      << padRight("-", 12)
+                      << padRight(label, 8)
                       << "\n";
         }
         getString("\nEnter를 누르면 위로...");

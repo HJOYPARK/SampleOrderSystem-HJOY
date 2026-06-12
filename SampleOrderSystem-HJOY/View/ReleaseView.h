@@ -24,22 +24,21 @@ public:
             }
 
             std::cout << "출고 가능 주문  (CONFIRMED)\n\n";
-            std::cout << std::left
-                      << std::setw(6)  << "번호"
-                      << std::setw(20) << "주문번호"
-                      << std::setw(14) << "고객"
-                      << std::setw(22) << "시료"
+            std::cout << padRight("번호", 6)
+                      << padRight("주문번호", 20)
+                      << padRight("고객", 14)
+                      << padRight("시료", 22)
                       << "수량\n";
 
             for (int i = 0; i < static_cast<int>(releasable.size()); ++i) {
                 auto& o = releasable[i];
                 auto sOpt = sampleRepo_.findById(o.sampleId);
                 std::string sname = sOpt.has_value() ? sOpt->name : o.sampleId;
-                std::cout << "[" << (i+1) << "]"
-                          << std::setw(3)  << ""
-                          << std::setw(20) << o.orderId
-                          << std::setw(14) << o.customerName
-                          << std::setw(22) << sname
+                std::string numStr = "[" + std::to_string(i+1) + "]";
+                std::cout << padRight(numStr, 6)
+                          << padRight(o.orderId, 20)
+                          << padRight(o.customerName, 14)
+                          << padRight(sname, 22)
                           << o.quantity << " ea\n";
             }
 

@@ -4,6 +4,41 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <algorithm>
+
+// UTF-8 display width: Korean/CJK = 2 columns, ASCII = 1 column
+inline int utf8DisplayWidth(const std::string& s) {
+    int width = 0;
+    for (size_t i = 0; i < s.size(); ) {
+        unsigned char c = static_cast<unsigned char>(s[i]);
+        uint32_t cp = 0;
+        int len = 1;
+        if      (c < 0x80) { cp = c;            len = 1; }
+        else if (c < 0xE0) { cp = c & 0x1F;     len = 2; }
+        else if (c < 0xF0) { cp = c & 0x0F;     len = 3; }
+        else                { cp = c & 0x07;     len = 4; }
+        for (int k = 1; k < len && i + k < s.size(); ++k)
+            cp = (cp << 6) | (static_cast<unsigned char>(s[i+k]) & 0x3F);
+        // CJK Unified, Korean, etc. are double-width
+        if ((cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo
+            (cp >= 0x2E80 && cp <= 0x9FFF) ||   // CJK block
+            (cp >= 0xAC00 && cp <= 0xD7AF) ||   // Hangul syllables
+            (cp >= 0xF900 && cp <= 0xFAFF) ||   // CJK compat
+            (cp >= 0xFF00 && cp <= 0xFF60))      // Fullwidth forms
+            width += 2;
+        else
+            width += 1;
+        i += len;
+    }
+    return width;
+}
+
+// Pad string to target display width (right-pad with spaces)
+inline std::string padRight(const std::string& s, int targetDisplayWidth) {
+    int dw = utf8DisplayWidth(s);
+    int pad = std::max(0, targetDisplayWidth - dw);
+    return s + std::string(pad, ' ');
+}
 
 inline std::string currentDateTimeString() {
     std::time_t t = std::time(nullptr);

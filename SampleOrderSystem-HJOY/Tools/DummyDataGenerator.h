@@ -13,9 +13,16 @@ public:
     void generateSamples(int count) {
         SampleRepository repo(dataDir_ + "samples.json");
         static const char* names[] = {
-            "Silicon Wafer-8inch", "GaN Epitaxial-4inch", "SiC Power-6inch",
-            "Photoresist-PR7", "Oxide Wafer-SiO2", "InP Substrate",
-            "Ge Wafer", "Diamond Substrate", "AlGaAs Epitaxial", "SiGe Layer"
+            "실리콘 웨이퍼-8인치",
+            "GaN 에피택셀-4인치",
+            "SiC 파워기판-6인치",
+            "포토레지스트-PR7",
+            "산화막 웨이퍼-SiO2",
+            "InP 기판",
+            "Ge 웨이퍼",
+            "다이아몬드 기판",
+            "AlGaAs 에피택셀",
+            "SiGe 레이어"
         };
         static double times[]  = {0.5, 0.3, 0.8, 0.2, 0.6, 0.7, 0.4, 1.0, 0.35, 0.45};
         static double yields[] = {0.92, 0.78, 0.92, 0.95, 0.88, 0.82, 0.90, 0.75, 0.85, 0.80};

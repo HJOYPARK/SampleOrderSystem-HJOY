@@ -25,24 +25,23 @@ public:
             }
 
             std::cout << "승인 대기 중인 예약 목록  (RESERVED)\n\n";
-            std::cout << std::left
-                      << std::setw(6)  << "번호"
-                      << std::setw(20) << "주문번호"
-                      << std::setw(18) << "고객"
-                      << std::setw(22) << "시료"
-                      << std::setw(10) << "수량"
+            std::cout << padRight("번호", 6)
+                      << padRight("주문번호", 20)
+                      << padRight("고객", 18)
+                      << padRight("시료", 22)
+                      << padRight("수량", 10)
                       << "상태\n";
 
             for (int i = 0; i < static_cast<int>(pending.size()); ++i) {
                 auto& o = pending[i];
                 auto sOpt = sampleRepo_.findById(o.sampleId);
                 std::string sname = sOpt.has_value() ? sOpt->name : o.sampleId;
-                std::cout << "[" << (i+1) << "]"
-                          << std::setw(3) << ""
-                          << std::setw(20) << o.orderId
-                          << std::setw(18) << o.customerName
-                          << std::setw(22) << sname
-                          << std::setw(10) << (std::to_string(o.quantity) + " ea")
+                std::string numStr = "[" + std::to_string(i+1) + "]";
+                std::cout << padRight(numStr, 6)
+                          << padRight(o.orderId, 20)
+                          << padRight(o.customerName, 18)
+                          << padRight(sname, 22)
+                          << padRight(std::to_string(o.quantity) + " ea", 10)
                           << "RESERVED\n";
             }
 

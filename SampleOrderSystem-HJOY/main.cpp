@@ -1,3 +1,5 @@
+#define NOMINMAX
+#include <windows.h>
 #include "Repository/SampleRepository.h"
 #include "Repository/OrderRepository.h"
 #include "Model/ProductionQueue.h"
@@ -18,6 +20,13 @@
 #include <filesystem>
 
 int main() {
+    // Set console output to UTF-8 so Korean strings display correctly
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    // Disable sync for faster I/O
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
     // Ensure data directory exists
     std::filesystem::create_directories("data");
 

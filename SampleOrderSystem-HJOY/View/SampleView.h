@@ -32,19 +32,22 @@ private:
         int end   = std::min(start + PAGE_SIZE, total);
 
         std::cout << "\n등록 시료 목록  (총 " << total << "종)\n\n";
-        std::cout << std::left
-                  << std::setw(10) << "ID"
-                  << std::setw(24) << "시료명"
-                  << std::setw(17) << "평균 생산시간"
-                  << std::setw(8)  << "수율"
-                  << "현재 재고\n";
+        std::cout << padRight("ID", 10)
+                  << padRight("시료명", 22)
+                  << padRight("평균 생산시간", 16)
+                  << padRight("수율", 8)
+                  << "현재 재고\n"
+                  << std::string(70, '-') << "\n";
 
         for (int i = start; i < end; ++i) {
             const auto& s = samples[i];
-            std::cout << std::setw(10) << s.id
-                      << std::setw(24) << s.name
-                      << std::setw(14) << (std::to_string(s.avgProductionTime) + " min/ea")
-                      << std::setw(8)  << s.yieldRate
+            std::ostringstream aptStr, yrStr;
+            aptStr << std::fixed << std::setprecision(1) << s.avgProductionTime << " min/ea";
+            yrStr  << std::fixed << std::setprecision(2) << s.yieldRate;
+            std::cout << padRight(s.id,   10)
+                      << padRight(s.name, 22)
+                      << padRight(aptStr.str(), 16)
+                      << padRight(yrStr.str(),  8)
                       << s.stock << " ea\n";
         }
         if (end < total)

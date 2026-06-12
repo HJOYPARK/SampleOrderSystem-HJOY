@@ -41,20 +41,19 @@ public:
             auto waiting = ctrl_.getWaitingJobs();
             std::cout << "대기 중인 주문  (FIFO 순)  " << waiting.size() << "건\n\n";
             if (!waiting.empty()) {
-                std::cout << std::left
-                          << std::setw(6)  << "순서"
-                          << std::setw(20) << "주문번호"
-                          << std::setw(22) << "시료"
-                          << std::setw(10) << "부족분"
+                std::cout << padRight("순서", 6)
+                          << padRight("주문번호", 20)
+                          << padRight("시료", 22)
+                          << padRight("부족분", 10)
                           << "실생산량\n";
                 for (int i = 0; i < static_cast<int>(waiting.size()); ++i) {
                     auto& job = waiting[i];
                     auto sOpt = sampleRepo_.findById(job.sampleId);
                     std::string sname = sOpt.has_value() ? sOpt->name : job.sampleId;
-                    std::cout << std::setw(6)  << (i+1)
-                              << std::setw(20) << job.orderId
-                              << std::setw(22) << sname
-                              << std::setw(10) << (std::to_string(job.shortage) + " ea")
+                    std::cout << padRight(std::to_string(i+1), 6)
+                              << padRight(job.orderId, 20)
+                              << padRight(sname, 22)
+                              << padRight(std::to_string(job.shortage) + " ea", 10)
                               << job.actualProduction << " ea\n";
                 }
             }
