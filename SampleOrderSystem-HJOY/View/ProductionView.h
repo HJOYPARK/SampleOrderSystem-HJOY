@@ -29,10 +29,11 @@ public:
                 auto sOpt = sampleRepo_.findById(job.sampleId);
                 std::string sname = sOpt.has_value() ? sOpt->name : job.sampleId;
 
-                // 진행률 계산
-                double progress = ctrl_.getCurrentJobProgress();
-                int pct         = static_cast<int>(progress * 100);
-                double remainMin = job.totalProductionTime * (1.0 - progress);
+                // 실시간 진행률 계산
+                int    produced  = ctrl_.getLiveProducedCount();
+                double progress  = ctrl_.getCurrentJobProgress();
+                int    pct       = static_cast<int>(progress * 100);
+                double remainMin = job.avgProductionTime * (job.actualProduction - produced);
 
                 std::cout << "현재 처리 중  [RUNNING]\n\n";
                 std::cout << "  주문번호  " << job.orderId << "   시료  " << sname << "\n";
@@ -44,11 +45,14 @@ public:
                           << " / " << std::fixed << std::setprecision(1)
                           << job.totalProductionTime << " min)\n";
 
+                std::cout << "  생산완료  " << produced << " / " << job.actualProduction << " ea"
+                          << "   (개당 " << job.avgProductionTime << " min)\n";
+
                 std::cout << "  진행      " << makeBar(progress) << "  " << pct << "%";
                 if (progress < 1.0)
                     std::cout << "   잔여 " << std::fixed << std::setprecision(1) << remainMin << " min";
                 else
-                    std::cout << "   완료 대기 중...";
+                    std::cout << "   완료 처리 중...";
                 std::cout << "\n\n";
             } else {
                 std::cout << "현재 처리 중인 생산 작업 없음\n\n";

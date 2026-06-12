@@ -115,6 +115,7 @@ std::string JsonSerializer::toJson(const Order& o) {
         << ",\"productionStartTime\":" << static_cast<long long>(o.productionStartTime)
         << ",\"shortage\":" << o.shortage
         << ",\"actualProduction\":" << o.actualProduction
+        << ",\"producedCount\":" << o.producedCount
         << "}";
     return oss.str();
 }
@@ -139,5 +140,6 @@ Order JsonSerializer::orderFromJson(const std::string& json) {
     o.productionStartTime = static_cast<std::time_t>(extractLongLongValue(json, "productionStartTime"));
     o.shortage            = extractIntValue(json, "shortage");
     o.actualProduction    = extractIntValue(json, "actualProduction");
+    o.producedCount       = extractIntValue(json, "producedCount");
     return o;
 }
